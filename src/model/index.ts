@@ -71,10 +71,6 @@ export async function seedDatabase() {
   }
 }
 
-export async function getAddressById(guid: string) {
-  return await db("address").where({ guid }).first();
-}
-
 export async function getAddressesByTag(
   tag: string,
   isActive: boolean

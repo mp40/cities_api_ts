@@ -1,11 +1,6 @@
 import { Request, Response, Router } from "express";
 import { z } from "zod";
-import {
-  getAddressById,
-  getAddressesByTag,
-  getAllAddresses,
-  getDistance,
-} from "./model";
+import { getAddressesByTag, getAllAddresses, getDistance } from "./model";
 import { createQueuedJob } from "./model/utils";
 import jobQueue from "./services/queue";
 
@@ -13,12 +8,6 @@ export const router = Router({ strict: true });
 
 router.get("/", (req: Request, res: Response) => {
   res.send("cities api");
-});
-
-router.get("/address/:id", async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const address = await getAddressById(id);
-  res.json(address);
 });
 
 router.get("/cities-by-tag", async (req: Request, res: Response) => {
