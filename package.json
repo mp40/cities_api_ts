@@ -6,7 +6,6 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
     "dev": "tsc --watch",
     "build": "tsc",
     "start": "node ./dist/runServer.js"
