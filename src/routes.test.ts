@@ -78,3 +78,27 @@ test("distance: it returns distance between to locations", async () => {
     distance: 789,
   });
 });
+
+test("area: it handles invalid query params", async () => {
+  const req = request(app);
+  const res = await req.get("/area").query({
+    from: "123",
+    distance: "x",
+  });
+
+  expect(res.status).toBe(400);
+});
+
+test("area: it returns a url for polling", async () => {
+  const req = request(app);
+  const res = await req.get("/area").query({
+    from: "123",
+    distance: 100,
+  });
+
+  expect(res.status).toBe(202);
+  expect(res.body).toEqual({
+    resultsUrl:
+      "http://127.0.0.1:8080/area-result/2152f96f-50c7-4d76-9e18-f7033bd14428",
+  });
+});

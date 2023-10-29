@@ -1,6 +1,7 @@
-import { Router, Request, Response } from "express";
-import { getAddressById, getAddressesByTag, getDistance } from "./model";
+import { Request, Response, Router } from "express";
 import { z } from "zod";
+import { getAddressById, getAddressesByTag, getDistance } from "./model";
+import { generatePollingUrl } from "./model/utils";
 
 export const router = Router({ strict: true });
 
@@ -49,4 +50,21 @@ router.get("/distance", async (req: Request, res: Response) => {
   const distance = await getDistance(parsed.data.from, parsed.data.to);
 
   res.json(distance);
+});
+
+router.get("/area", async (req: Request, res: Response) => {
+  const parsed = z
+    .object({
+      from: z.string(),
+      distance: z.string().transform((x) => Number(x)),
+    })
+    .safeParse(req.query);
+
+  if (!parsed.success || isNaN(parsed.data.distance)) {
+    return res.sendStatus(400);
+  }
+
+  res.status(202).json({
+    resultsUrl: generatePollingUrl(),
+  });
 });
