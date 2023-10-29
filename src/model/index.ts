@@ -37,7 +37,7 @@ type Distance = {
   distance: number;
 };
 
-export async function createTable() {
+export async function createTable(): Promise<void> {
   await db.schema.dropTableIfExists("address");
 
   await db.schema.createTable("address", (table) => {
@@ -50,7 +50,7 @@ export async function createTable() {
   });
 }
 
-export async function seedDatabase() {
+export async function seedDatabase(): Promise<void> {
   const addresses = readFileSync(
     path.join(process.cwd(), "./assets/addresses.json"),
     "utf-8"
@@ -75,20 +75,25 @@ export async function getAddressesByTag(
   tag: string,
   isActive: boolean
 ): Promise<Address[]> {
-  const unserialized = (await db("address").where(function () {
+  const addresses = await db<AddressRow>("address").where(function () {
     this.where("tags", "LIKE", `%${tag}%`).andWhere("isActive", isActive);
-  })) as AddressRow[];
+  });
 
-  return unserialized.map((row) => serializeAddress(row));
+  return addresses.map((row) => serializeAddress(row));
 }
 
-export async function getDistance(from: string, to: string): Promise<Distance> {
-  const fromAddress = (await db("address")
+export async function getDistance(
+  from: string,
+  to: string
+): Promise<Distance | null> {
+  const fromAddress = await db<AddressRow>("address")
     .where({ guid: from })
-    .first()) as AddressRow;
-  const toAddress = (await db("address")
-    .where({ guid: to })
-    .first()) as AddressRow;
+    .first();
+  const toAddress = await db<AddressRow>("address").where({ guid: to }).first();
+
+  if (!fromAddress || !toAddress) {
+    return null;
+  }
 
   const distance = calculateDistance(fromAddress, toAddress);
 
@@ -103,14 +108,18 @@ export async function getDistance(from: string, to: string): Promise<Distance> {
 export async function getAddressesInRadius(
   from: string,
   distance: number
-): Promise<Address[]> {
-  const fromAddress = (await db("address")
+): Promise<Address[] | null> {
+  const fromAddress = await db<AddressRow>("address")
     .where({ guid: from })
-    .first()) as AddressRow;
+    .first();
 
-  const addresses = (await db("address").whereNot({
+  if (!fromAddress) {
+    return null;
+  }
+
+  const addresses = await db<AddressRow>("address").whereNot({
     guid: from,
-  })) as AddressRow[];
+  });
 
   const addressesInRadius = addresses.filter((address) => {
     const addressDistance = calculateDistance(fromAddress, address);
@@ -120,7 +129,7 @@ export async function getAddressesInRadius(
   return addressesInRadius.map(serializeAddress);
 }
 
-export async function getAllAddresses() {
-  const addresses = await db("address");
-  return addresses.map(serializeAddress);
+export async function getAllAddresses(): Promise<Address[]> {
+  const addresses = await db<AddressRow>("address");
+  return addresses.map((address) => serializeAddress(address));
 }

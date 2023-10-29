@@ -58,6 +58,18 @@ test("distance: it handles invalid query params", async () => {
   expect(res.status).toBe(400);
 });
 
+test("distance: it handles null result", async () => {
+  vi.spyOn(model, "getDistance").mockResolvedValueOnce(null);
+
+  const req = request(app);
+  const res = await req.get("/distance").query({
+    from: "123",
+    to: "456",
+  });
+
+  expect(res.status).toBe(404);
+});
+
 test("distance: it returns distance between to locations", async () => {
   vi.spyOn(model, "getDistance").mockResolvedValueOnce({
     from: { guid: "123" } as model.Address,
@@ -108,12 +120,21 @@ test("area: it returns a url for polling", async () => {
 });
 
 test("area-result: it returns 202 if completed job not found", async () => {
-  vi.spyOn(jobQueue, "getJobResult").mockReturnValueOnce(undefined);
+  vi.spyOn(jobQueue, "getJobResult").mockReturnValueOnce(null);
 
   const req = request(app);
   const res = await req.get("/area-result/abc");
 
   expect(res.status).toBe(202);
+});
+
+test("area-result: it returns 404 if location not found", async () => {
+  vi.spyOn(jobQueue, "getJobResult").mockReturnValueOnce("not found");
+
+  const req = request(app);
+  const res = await req.get("/area-result/abc");
+
+  expect(res.status).toBe(404);
 });
 
 test("area-result: it returns locations if job complete", async () => {

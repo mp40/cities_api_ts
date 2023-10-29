@@ -43,6 +43,9 @@ router.get("/distance", async (req: Request, res: Response) => {
   }
 
   const distance = await getDistance(parsed.data.from, parsed.data.to);
+  if (!distance) {
+    return res.sendStatus(404);
+  }
 
   res.json(distance);
 });
@@ -76,6 +79,10 @@ router.get("/area-result/:id", async (req: Request, res: Response) => {
 
   if (!jobResult) {
     return res.sendStatus(202);
+  }
+
+  if (jobResult === "not found") {
+    return res.sendStatus(404);
   }
 
   res.json({

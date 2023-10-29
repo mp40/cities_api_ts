@@ -6,10 +6,10 @@ type JobData = {
   distance: number;
 };
 
-class JobQueue {
+export class JobQueue {
   jobs: JobData[];
   isProcessing: boolean;
-  results: Map<string, Address[]>;
+  results: Map<string, Address[] | "not found">;
   constructor() {
     this.jobs = [];
     this.results = new Map();
@@ -30,15 +30,20 @@ class JobQueue {
       }
 
       const result = await getAddressesInRadius(jobData.from, jobData.distance);
-      this.results.set(jobData.jobId, result);
+      this.results.set(jobData.jobId, result || "not found");
 
       this.isProcessing = false;
       this.processJobs();
     }
   }
 
-  getJobResult(jobId: string): Address[] | undefined {
-    return this.results.get(jobId);
+  getJobResult(jobId: string): Address[] | "not found" | null {
+    const result = this.results.get(jobId);
+    if (!result) {
+      return null;
+    }
+
+    return result;
   }
 }
 

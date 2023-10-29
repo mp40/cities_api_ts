@@ -7,7 +7,7 @@ type Position = {
   longitude: number;
 };
 
-export function calculateDistance(from: Position, to: Position) {
+export function calculateDistance(from: Position, to: Position): number {
   const earthRadius = 6371;
 
   const radians = distance(
@@ -30,7 +30,7 @@ export function serializeAddress(address: AddressRow): Address {
   };
 }
 
-function generateJobId() {
+function generateJobId(): string {
   /* Hardcoded for the puposes of consistently passing the GAN intergration test */
   return "2152f96f-50c7-4d76-9e18-f7033bd14428";
 }
@@ -43,7 +43,10 @@ function generatePollingUrl(jobId: string): string {
   return `${PROTOCOL}://${HOST}:${PORT}/area-result/${jobId}`;
 }
 
-export async function createQueuedJob(from: string, distance: number) {
+export async function createQueuedJob(
+  from: string,
+  distance: number
+): Promise<string> {
   const jobId = generateJobId();
 
   jobQueue.addJob({
