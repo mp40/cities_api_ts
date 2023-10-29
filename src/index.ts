@@ -1,5 +1,6 @@
 import express from "express";
 import { router } from "./routes";
+import { authorization } from "./middleware";
 
 const app = express();
 
@@ -8,19 +9,9 @@ export const setupExpressServer = () => {
 };
 
 app.use((req, res, next) => {
-  const authorizationHeader = req.headers["authorization"];
-  if (authorizationHeader === undefined) {
-    return res.status(401).send("Unauthorized");
-  }
+  const authorised = authorization(req);
 
-  const token = authorizationHeader.replace("bearer ", "");
-
-  try {
-    if (atob(token) !== "thesecrettoken") {
-      return res.status(401).send("Unauthorized");
-    }
-  } catch (error) {
-    console.error(error);
+  if (!authorised) {
     return res.status(401).send("Unauthorized");
   }
 
