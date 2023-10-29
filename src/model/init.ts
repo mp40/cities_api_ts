@@ -1,4 +1,4 @@
-import { createTable, seedDatabase } from "./index.";
+import { createTable, seedDatabase } from ".";
 
 export async function setupDatabase() {
   console.log("create table");

@@ -57,3 +57,15 @@ export async function seedDatabase() {
 export async function getAddressById(guid: string) {
   return await db("address").where({ guid }).first();
 }
+
+export async function getAddressesByTag(tag: string, isActive: boolean) {
+  const unserialized = await db("address").where(function () {
+    this.where("tags", "LIKE", `%${tag}%`).andWhere("isActive", isActive);
+  });
+
+  return unserialized.map((row) => ({
+    ...row,
+    isActive: row.isActive === 1,
+    tags: JSON.parse(row.tags),
+  }));
+}
