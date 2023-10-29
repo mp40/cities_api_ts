@@ -46,3 +46,35 @@ test("cities by tag: it returns cities", async () => {
     ],
   });
 });
+
+test("distance: it handles invalid query params", async () => {
+  const req = request(app);
+  const res = await req.get("/distance").query({
+    wrong: "value",
+  });
+
+  expect(res.status).toBe(400);
+});
+
+test("distance: it returns distance between to locations", async () => {
+  vi.spyOn(model, "getDistance").mockResolvedValueOnce({
+    from: { guid: "123" } as model.Address,
+    to: { guid: "456" } as model.Address,
+    unit: "km",
+    distance: 789,
+  });
+
+  const req = request(app);
+
+  const res = await req.get("/distance").query({
+    from: "123",
+    to: "456",
+  });
+
+  expect(res.body).toEqual({
+    from: { guid: "123" },
+    to: { guid: "456" },
+    unit: "km",
+    distance: 789,
+  });
+});

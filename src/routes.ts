@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { getAddressById, getAddressesByTag } from "./model";
+import { getAddressById, getAddressesByTag, getDistance } from "./model";
 import { z } from "zod";
 
 export const router = Router({ strict: true });
@@ -32,4 +32,21 @@ router.get("/cities-by-tag", async (req: Request, res: Response) => {
   );
 
   res.json({ cities: addresses });
+});
+
+router.get("/distance", async (req: Request, res: Response) => {
+  const parsed = z
+    .object({
+      from: z.string(),
+      to: z.string(),
+    })
+    .safeParse(req.query);
+
+  if (!parsed.success) {
+    return res.sendStatus(400);
+  }
+
+  const distance = await getDistance(parsed.data.from, parsed.data.to);
+
+  res.json(distance);
 });
