@@ -32,3 +32,7 @@ database setup complete
 * Used TypeScript over JavaScript to leverage type safety.
 * Opted for the use of the `zod` package to parse incoming data.
 
+### Area For Improvement
+* Error handling could be improved. At the moment it relies on returning null values and strings (eg: `queue.getJobResult(jobId: string): Address[] | "not found" | null`). My preference would be using the `ts-results` package to type errors in model and services methods.
+
+
