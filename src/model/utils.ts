@@ -31,7 +31,7 @@ export function serializeAddress(address: AddressRow): Address {
 }
 
 function generateJobId(): string {
-  /* Hardcoded for the puposes of consistently passing the GAN intergration test */
+  /* Hardcoded for the purposes of consistently passing the GAN integration test */
   return "2152f96f-50c7-4d76-9e18-f7033bd14428";
 }
 
