@@ -1,4 +1,5 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import { router } from "./routes";
 
 const app = express();
 
@@ -6,6 +7,4 @@ export const setupExpressServer = () => {
   return app;
 };
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("working");
-});
+app.use("/", router);
