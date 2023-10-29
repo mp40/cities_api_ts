@@ -8,7 +8,7 @@ npm install
 npm run build
 npm run start
 ```
-If started without issue the following should be visible in the terminal
+When start process complete the following should be visible in the terminal
 ```
 create table
 Server running on: 8080
