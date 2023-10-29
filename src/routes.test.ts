@@ -1,7 +1,9 @@
-import request from "supertest";
 import express from "express";
-import { router } from "./routes";
+import request from "supertest";
 import * as model from "./model/index";
+import * as utils from "./model/utils";
+import { router } from "./routes";
+import jobQueue from "./services/queue";
 
 const app = express();
 app.use("/", router);
@@ -90,6 +92,9 @@ test("area: it handles invalid query params", async () => {
 });
 
 test("area: it returns a url for polling", async () => {
+  vi.spyOn(utils, "createQueuedJob").mockResolvedValueOnce(
+    "http://127.0.0.1:8080/area-result/fake-job-id"
+  );
   const req = request(app);
   const res = await req.get("/area").query({
     from: "123",
@@ -98,7 +103,26 @@ test("area: it returns a url for polling", async () => {
 
   expect(res.status).toBe(202);
   expect(res.body).toEqual({
-    resultsUrl:
-      "http://127.0.0.1:8080/area-result/2152f96f-50c7-4d76-9e18-f7033bd14428",
+    resultsUrl: "http://127.0.0.1:8080/area-result/fake-job-id",
+  });
+});
+
+test("area-result: it returns 202 if completed job not found", async () => {
+  vi.spyOn(jobQueue, "getJobResult").mockReturnValueOnce(undefined);
+
+  const req = request(app);
+  const res = await req.get("/area-result/abc");
+
+  expect(res.status).toBe(202);
+});
+
+test("area-result: it returns locations if job complete", async () => {
+  vi.spyOn(jobQueue, "getJobResult").mockReturnValueOnce([]);
+
+  const req = request(app);
+  const res = await req.get("/area-result/abc");
+
+  expect(res.body).toEqual({
+    cities: [],
   });
 });

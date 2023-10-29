@@ -1,5 +1,6 @@
-import { Address, AddressRow } from ".";
 import { distance, round } from "@turf/turf";
+import { Address, AddressRow } from ".";
+import jobQueue from "../services/queue";
 
 type Position = {
   latitude: number;
@@ -34,12 +35,22 @@ function generateJobId() {
   return "2152f96f-50c7-4d76-9e18-f7033bd14428";
 }
 
-export function generatePollingUrl() {
+function generatePollingUrl(jobId: string): string {
   const PROTOCOL = process.env.PROTOCOL || "http";
   const HOST = process.env.HOST || "127.0.0.1";
   const PORT = process.env.PORT || 8080;
 
+  return `${PROTOCOL}://${HOST}:${PORT}/area-result/${jobId}`;
+}
+
+export async function createQueuedJob(from: string, distance: number) {
   const jobId = generateJobId();
 
-  return `${PROTOCOL}://${HOST}:${PORT}/area-result/${jobId}`;
+  jobQueue.addJob({
+    jobId,
+    from,
+    distance,
+  });
+
+  return generatePollingUrl(jobId);
 }

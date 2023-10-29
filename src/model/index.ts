@@ -107,3 +107,23 @@ export async function getDistance(from: string, to: string): Promise<Distance> {
     distance,
   };
 }
+
+export async function getAddressesInRadius(
+  from: string,
+  distance: number
+): Promise<Address[]> {
+  const fromAddress = (await db("address")
+    .where({ guid: from })
+    .first()) as AddressRow;
+
+  const addresses = (await db("address").whereNot({
+    guid: from,
+  })) as AddressRow[];
+
+  const addressesInRadius = addresses.filter((address) => {
+    const addressDistance = calculateDistance(fromAddress, address);
+    return addressDistance <= distance;
+  });
+
+  return addressesInRadius.map(serializeAddress);
+}

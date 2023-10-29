@@ -1,7 +1,8 @@
 import { Request, Response, Router } from "express";
 import { z } from "zod";
 import { getAddressById, getAddressesByTag, getDistance } from "./model";
-import { generatePollingUrl } from "./model/utils";
+import { createQueuedJob } from "./model/utils";
+import jobQueue from "./services/queue";
 
 export const router = Router({ strict: true });
 
@@ -64,7 +65,26 @@ router.get("/area", async (req: Request, res: Response) => {
     return res.sendStatus(400);
   }
 
+  const resultsUrl = await createQueuedJob(
+    parsed.data.from,
+    parsed.data.distance
+  );
+
   res.status(202).json({
-    resultsUrl: generatePollingUrl(),
+    resultsUrl,
+  });
+});
+
+router.get("/area-result/:id", async (req: Request, res: Response) => {
+  const jobId = req.params.id;
+
+  const jobResult = jobQueue.getJobResult(jobId);
+
+  if (!jobResult) {
+    return res.sendStatus(202);
+  }
+
+  res.json({
+    cities: jobResult,
   });
 });
