@@ -15,6 +15,7 @@ Server running on: 8080
 seed table
 database setup complete
 ```
+Follow the instructions in the GAN Integrity repo to run the calls against the API. 
 
 ### Notes
 #### Database
