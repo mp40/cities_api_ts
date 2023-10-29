@@ -79,15 +79,11 @@ export async function getAddressesByTag(
   tag: string,
   isActive: boolean
 ): Promise<Address[]> {
-  const unserialized = await db("address").where(function () {
+  const unserialized = (await db("address").where(function () {
     this.where("tags", "LIKE", `%${tag}%`).andWhere("isActive", isActive);
-  });
+  })) as AddressRow[];
 
-  return unserialized.map((row) => ({
-    ...row,
-    isActive: row.isActive === 1,
-    tags: JSON.parse(row.tags),
-  }));
+  return unserialized.map((row) => serializeAddress(row));
 }
 
 export async function getDistance(from: string, to: string): Promise<Distance> {
