@@ -127,3 +127,8 @@ export async function getAddressesInRadius(
 
   return addressesInRadius.map(serializeAddress);
 }
+
+export async function getAllAddresses() {
+  const addresses = await db("address");
+  return addresses.map(serializeAddress);
+}

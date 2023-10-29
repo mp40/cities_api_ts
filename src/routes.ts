@@ -1,6 +1,11 @@
 import { Request, Response, Router } from "express";
 import { z } from "zod";
-import { getAddressById, getAddressesByTag, getDistance } from "./model";
+import {
+  getAddressById,
+  getAddressesByTag,
+  getAllAddresses,
+  getDistance,
+} from "./model";
 import { createQueuedJob } from "./model/utils";
 import jobQueue from "./services/queue";
 
@@ -87,4 +92,26 @@ router.get("/area-result/:id", async (req: Request, res: Response) => {
   res.json({
     cities: jobResult,
   });
+});
+
+router.get("/all-cities", async (req: Request, res: Response) => {
+  const cities = await getAllAddresses();
+
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader(
+    "Content-Disposition",
+    'attachment; filename="all-cities.json"'
+  );
+
+  res.status(200).write("[");
+
+  for (let i = 0; i < cities.length; i++) {
+    res.write(JSON.stringify(cities[i]));
+    if (i !== cities.length - 1) {
+      res.write(",");
+    }
+  }
+
+  res.write("]");
+  res.end();
 });

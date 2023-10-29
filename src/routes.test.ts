@@ -126,3 +126,30 @@ test("area-result: it returns locations if job complete", async () => {
     cities: [],
   });
 });
+
+test("all-cities: it returns all cities", async () => {
+  vi.spyOn(model, "getAllAddresses").mockResolvedValueOnce([
+    {
+      guid: "123",
+      isActive: true,
+      address: "123",
+      latitude: 123,
+      longitude: 123,
+      tags: ["fake-tag"],
+    },
+  ]);
+
+  const req = request(app);
+  const res = await req.get("/all-cities");
+
+  expect(res.body).toEqual([
+    {
+      guid: "123",
+      isActive: true,
+      address: "123",
+      latitude: 123,
+      longitude: 123,
+      tags: ["fake-tag"],
+    },
+  ]);
+});
