@@ -7,14 +7,14 @@ test("it handles authentication success", async () => {
   const req = request(app);
   const res = await req
     .get("/")
-    .set("Authorization", "bearer dGhlc2VjcmV0dG9rZW4=");
+    .set("Authorization", "Bearer dGhlc2VjcmV0dG9rZW4=");
 
   expect(res.status).toBe(200);
 });
 
 test("it handles authentication failure", async () => {
   const req = request(app);
-  const res = await req.get("/").set("Authorization", "bearer 123");
+  const res = await req.get("/").set("Authorization", "Bearer 123");
 
   expect(res.status).toBe(401);
 });

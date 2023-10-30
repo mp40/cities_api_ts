@@ -6,7 +6,7 @@ export function authorization(req: Request): boolean {
     return false;
   }
 
-  const token = authorizationHeader.replace("bearer ", "");
+  const token = authorizationHeader.replace(/bearer /i, "");
 
   const SECRET = process.env.SECRET || "thesecrettoken";
 
